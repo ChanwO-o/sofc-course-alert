@@ -1,6 +1,7 @@
 from flask import *
 import requests
 from bs4 import BeautifulSoup
+import send_sms
 
 app = Flask(__name__)
 URL = 'https://www.reg.uci.edu/perl/WebSoc'
@@ -10,8 +11,9 @@ DATA = 'Submit=Display+Web+Results&YearTerm=2019-03&ShowComments=on&ShowFinals=o
 @app.route("/")
 def index():
 	response = requests.post(url = URL, data = DATA)
-	return processResponseString(response)
-
+	coursetuple = processResponseString(response)
+	send_sms.sendMessage(coursetuple)
+	return coursetuple
 
 
 def processResponseString(response):
@@ -23,11 +25,11 @@ def processResponseString(response):
 	
 	
 	if len(allfonttags) == 0:
-		return 'ERROR no courses found'
+		return tuple('ERROR no courses found')
 	elif len(allfonttags) == 2: # will return list of length 2 only if course is FULL
-		return str(allfonttags[0]) + '	' + 'FULL'
+		return tuple((allfonttags[0].getText(), 'FULL'))
 	elif len(allfonttags) == 3: # course is OPEN or Waitl
-		return str(allfonttags[0]) + '	' + str(allfonttags[1])
+		return tuple((allfonttags[0].getText(), allfonttags[1].getText()))
 	
 	
 if __name__ == "__main__":  
