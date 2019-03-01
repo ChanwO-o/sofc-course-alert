@@ -8,7 +8,10 @@ client = Client(account_sid, auth_token)
 
 def sendMessage(coursetuple):
 	client.messages.create(
-		to="+13106668374",
-		from_="+12132796150",
-		body=str(coursetuple)
+		to = "+13106668374",
+		from_= "+12132796150",
+		body = "SofC\n" +
+		"Course name: " + coursetuple[0] + "\n" +
+		"Course code: " + str(123123) + "\n" +
+		"Status: " + coursetuple[1]
 	)
