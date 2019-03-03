@@ -6,7 +6,7 @@ import send_sms
 app = Flask(__name__)
 URL = 'https://www.reg.uci.edu/perl/WebSoc'
 
-DATA = 'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=34160&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
+DATA = 'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=341630&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
 
 @app.route("/")
 def index():
@@ -21,12 +21,16 @@ def processResponseString(response):
 	rtext = response.text
 	soup = BeautifulSoup(rtext, 'html.parser')
 	
+	# filter out no results
+	allfonttags = soup.findAll('font')
+	if len(allfonttags) == 0:
+		print('ERROR no courses found')
+		return tuple('ERROR no courses found')
+	
 	name = getCourseName(soup)
 	print(name)
 	
-	# allfonttags = soup.findAll('font') # returns list of html elements
-	# if len(allfonttags) == 0:
-		# return tuple('ERROR no courses found')
+	
 	# elif len(allfonttags) == 2: # will return list of length 2 only if course is FULL
 		# return tuple((allfonttags[0].getText(), 'FULL'))
 	# elif len(allfonttags) == 3: # course is OPEN or Waitl
@@ -35,6 +39,7 @@ def processResponseString(response):
 def getCourseName(soup):
 	""" Extract name from response """
 	return soup.find('tr', {'bgcolor' : '#fff0ff'}).find('b').text # tr tag with bgcolor -> get bold tag -> text
+	
 	
 if __name__ == "__main__":  
     app.run(port=8080)
