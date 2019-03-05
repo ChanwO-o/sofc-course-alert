@@ -19,7 +19,7 @@ def startWatchingCourse():
 	while True:
 		coursetuple = websoc.requestCourse(34150)
 		print(coursetuple)
-		# send_sms.sendMessage(coursetuple)
+		send_sms.sendMessage(coursetuple)
 		time.sleep(60)
 	
 def coursetupleToString(coursetuple):

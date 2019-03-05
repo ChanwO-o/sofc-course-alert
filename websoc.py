@@ -10,10 +10,10 @@ def constructRequestString(code):
 def requestCourse(code):
 	""" Make request for information on course by provided course code """
 	response = requests.post(url = URL, data = constructRequestString(code))
-	coursetuple = processResponse(response)
+	coursetuple = processResponse(response, code)
 	return coursetuple
 
-def processResponse(response):
+def processResponse(response, code):
 	""" Return a tuple with information on course. In the form of (name, code, type, max, enroll, waitlist, status)  """
 	rtext = response.text
 	soup = BeautifulSoup(rtext, 'html.parser')
@@ -30,12 +30,12 @@ def processResponse(response):
 	enroll = getCourseEnroll(soup)
 	waitlist = getCourseWaitlist(soup)
 	status = getCourseStatus(soup)
-	return(name, type, max, enroll, waitlist, status)
+	return(name, code, type, max, enroll, waitlist, status)
 	
 def getCourseName(soup):
 	""" Extract name from response """
 	return soup.find('tr', {'bgcolor' : '#fff0ff'}).find('b').text # tr tag with bgcolor -> get bold tag -> text
-
+	
 def getCourseType(soup):
 	""" Extract course type from response (lec, dis, lab, etc) """
 	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[1].text # tr tag with bgcolor -> get second td tag -> text
