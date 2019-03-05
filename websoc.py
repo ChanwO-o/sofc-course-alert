@@ -1,7 +1,16 @@
+import requests
 from bs4 import BeautifulSoup
 
-DATA = 'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=34090&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
+URL = 'https://www.reg.uci.edu/perl/WebSoc'
 
+def constructRequestString(code):
+	""" Construct the string to pass to websoc request """
+	return'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=' + str(code) + '&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
+
+def requestCourse(code):
+	""" Make request for information on course by provided course code """
+	response = requests.post(url = URL, data = constructRequestString(code))
+	coursetuple = processResponse(response)
 
 def processResponse(response):
 	""" Return a tuple with information on course. In the form of (name, code, type, max, enroll, waitlist, status)  """
