@@ -11,6 +11,7 @@ def requestCourse(code):
 	""" Make request for information on course by provided course code """
 	response = requests.post(url = URL, data = constructRequestString(code))
 	coursetuple = processResponse(response)
+	return coursetuple
 
 def processResponse(response):
 	""" Return a tuple with information on course. In the form of (name, code, type, max, enroll, waitlist, status)  """
@@ -29,7 +30,7 @@ def processResponse(response):
 	enroll = getCourseEnroll(soup)
 	waitlist = getCourseWaitlist(soup)
 	status = getCourseStatus(soup)
-	print(name, type, max, enroll, waitlist, status)
+	return(name, type, max, enroll, waitlist, status)
 	
 def getCourseName(soup):
 	""" Extract name from response """
