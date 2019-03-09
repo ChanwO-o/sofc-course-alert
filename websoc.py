@@ -43,13 +43,14 @@ def processResponse(response, codes):
 	result = []
 	for htmlblock in courseshtmlblocks:
 		soup = BeautifulSoup(htmlblock, 'html.parser')
-		cname = getCourseName(soup)
+		cnameshort = getCourseNameShort(soup)
+		cnamelong = getCourseNameLong(soup)
 		ctype = getCourseType(soup)
 		cmax = getCourseMax(soup)
 		cenroll = getCourseEnroll(soup)
 		cwaitlist = getCourseWaitlist(soup)
 		cstatus = getCourseStatus(soup)
-		print((cname, ctype, cmax, cenroll, cwaitlist, cstatus))
+		print((cnameshort, cnamelong, ctype, cmax, cenroll, cwaitlist, cstatus))
 	return result
 	
 def splitHtmlByCourse(soup):
@@ -57,26 +58,30 @@ def splitHtmlByCourse(soup):
 	courses = soup.prettify().split('<tr bgcolor="#fff0ff" valign="top">') # start of every <tr> tag that declares course name
 	return courses[1:len(courses)]
 	
-def getCourseName(soup):
-	""" Extract name from response """
-	return soup.find('b').text # tr tag with bgcolor -> get bold tag -> text
+def getCourseNameShort(soup):
+	""" Extract course short name from response (e.g. ICS 46) """
+	return soup.find('td', {'class' : 'CourseTitle'}).text.split('\n')[1].strip().encode('ascii', 'ignore').decode('utf-8')
+	
+def getCourseNameLong(soup):
+	""" Extract course long name from response (e.g. DATA STRC IMPL&ANLS) """
+	return soup.find('b').text.strip() # tr tag with bgcolor -> get bold tag -> text
 	
 def getCourseType(soup):
 	""" Extract course type from response (lec, dis, lab, etc) """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[1].text # tr tag with bgcolor -> get second td tag -> text
+	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[1].text.strip() # tr tag with bgcolor -> get second td tag -> text
 
 def getCourseMax(soup):
 	""" Extract course max count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[8].text # tr tag with bgcolor -> get ninth td tag -> text
+	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[8].text.strip() # tr tag with bgcolor -> get ninth td tag -> text
 
 def getCourseEnroll(soup):
 	""" Extract course enroll count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[9].text
+	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[9].text.strip()
 
 def getCourseWaitlist(soup):
 	""" Extract course waitlist count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[10].text
+	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[10].text.strip()
 
 def getCourseStatus(soup):
 	""" Extract course status from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[16].text
+	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[16].text.strip()
