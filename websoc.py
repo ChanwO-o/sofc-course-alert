@@ -6,9 +6,6 @@ URL = 'https://www.reg.uci.edu/perl/WebSoc'
 def constructRequestString(codes : [int]):
 	""" Construct the string to pass to websoc request """
 	return'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=' + constructCourseCodeString(codes) + '&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
-
-	'''	Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=34040+34090+34150&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room=
-	'''
 	
 def constructCourseCodeString(codes : [int]):
 	""" Construct course code portion of request string in the form of 34040+34090+34150 """
@@ -24,8 +21,8 @@ def constructCourseCodeString(codes : [int]):
 def requestCourses(codes):
 	""" Make request for information on course by provided course codes """
 	response = requests.post(url = URL, data = constructRequestString(codes))
-	coursesdata = processResponse(response, codes)
-	return coursesdata
+	coursesdatalist = processResponse(response, codes)
+	return coursesdatalist
 
 def processResponse(response, codes):
 	""" Return a list of tuples with information on courses. In the form of (name, code, type, max, enroll, waitlist, status)  """
@@ -36,7 +33,7 @@ def processResponse(response, codes):
 	allfonttags = soup.findAll('font')
 	if len(allfonttags) == 0:
 		print('ERROR no courses found')
-		return tuple('ERROR no courses found')
+		return ['ERROR no courses found']
 	
 	resultclasses = []
 	courseshtmlblocks = splitHtmlByCourse(soup) # first split html by course
@@ -46,7 +43,7 @@ def processResponse(response, codes):
 		cnamelong = getCourseNameLong(soup)
 		
 		classtrblocks = splitHtmlByClass(soup) # now split html by individual class (may contain multiple classes)
-		print('Number of classes found for course:', str(len(classtrblocks)))
+		# print('Number of classes found for course:', str(len(classtrblocks)))
 		for trblock in classtrblocks:
 			classinfolist = trblock.findAll('td')
 			ccode = getClassCode(classinfolist)
