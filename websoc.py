@@ -24,8 +24,8 @@ def constructCourseCodeString(codes : [int]):
 def requestCourses(codes):
 	""" Make request for information on course by provided course codes """
 	response = requests.post(url = URL, data = constructRequestString(codes))
-	coursetuple = processResponse(response, codes)
-	return coursetuple
+	coursesdata = processResponse(response, codes)
+	return coursesdata
 
 def processResponse(response, codes):
 	""" Return a list of tuples with information on courses. In the form of (name, code, type, max, enroll, waitlist, status)  """
@@ -38,25 +38,42 @@ def processResponse(response, codes):
 		print('ERROR no courses found')
 		return tuple('ERROR no courses found')
 	
-	courseshtmlblocks = splitHtmlByCourse(soup) # list of html blocks per course
-	
-	result = []
-	for htmlblock in courseshtmlblocks:
-		soup = BeautifulSoup(htmlblock, 'html.parser')
+	resultclasses = []
+	courseshtmlblocks = splitHtmlByCourse(soup) # first split html by course
+	for coursehtmlblock in courseshtmlblocks:
+		soup = BeautifulSoup(coursehtmlblock, 'html.parser') # soup = course block
 		cnameshort = getCourseNameShort(soup)
 		cnamelong = getCourseNameLong(soup)
-		ctype = getCourseType(soup)
-		cmax = getCourseMax(soup)
-		cenroll = getCourseEnroll(soup)
-		cwaitlist = getCourseWaitlist(soup)
-		cstatus = getCourseStatus(soup)
-		print((cnameshort, cnamelong, ctype, cmax, cenroll, cwaitlist, cstatus))
-	return result
+		
+		classtrblocks = splitHtmlByClass(soup) # now split html by individual class
+		print('Number of classes found:', str(len(classtrblocks)))
+		for trblock in classtrblocks:
+			ctype = getClassType(trblock) # can be multiple classes requested from here
+			cmax = getClassMax(trblock)
+			cenroll = getClassEnroll(trblock)
+			cwaitlist = getClassWaitlist(trblock)
+			cstatus = getClassStatus(trblock)
+			classtuple = (cnameshort, cnamelong, ctype, cmax, cenroll, cwaitlist, cstatus)
+			# print(classtuple)
+			resultclasses.append(classtuple)
+
+	return resultclasses
 	
 def splitHtmlByCourse(soup):
-	""" Split html into blocks by course & returned as a list """
+	""" Split html into big chunks by course & returned as a list (e.g. ICS46) """
 	courses = soup.prettify().split('<tr bgcolor="#fff0ff" valign="top">') # start of every <tr> tag that declares course name
 	return courses[1:len(courses)]
+	
+def splitHtmlByClass(soup):
+	"""
+	Find all <tr> blocks that represent a class & return as a list (all requested lec, dis, lab1, lab2 under one course)
+	If multiple classes are searched for one course (e.g. two lab sessions), websoc returns these classes as rows under one table.
+	Each row is a <tr> block with an alternating background color between '#FFFFCC' and 'DDEEFF'.
+	Some classes return more <tr> blocks with the same bgcolor, but the distinct leading <tr> block also has the valign="top" attribute attached as well.
+	"""
+	firstcolor = soup.findAll('tr', {'bgcolor' : '#FFFFCC', 'valign' : 'top'})
+	secondcolor = soup.findAll('tr', {'bgcolor' : '#DDEEFF', 'valign' : 'top'})
+	return firstcolor + secondcolor # return extended list
 	
 def getCourseNameShort(soup):
 	""" Extract course short name from response (e.g. ICS 46) """
@@ -66,22 +83,22 @@ def getCourseNameLong(soup):
 	""" Extract course long name from response (e.g. DATA STRC IMPL&ANLS) """
 	return soup.find('b').text.strip() # tr tag with bgcolor -> get bold tag -> text
 	
-def getCourseType(soup):
-	""" Extract course type from response (lec, dis, lab, etc) """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[1].text.strip() # tr tag with bgcolor -> get second td tag -> text
+def getClassType(soup):
+	""" Extract class type from response (lec, dis, lab, etc) """
+	return soup.findAll('td')[1].text.strip() # second td tag
 
-def getCourseMax(soup):
-	""" Extract course max count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[8].text.strip() # tr tag with bgcolor -> get ninth td tag -> text
+def getClassMax(soup):
+	""" Extract class max count from response """
+	return soup.findAll('td')[8].text.strip() # ninth td tag
 
-def getCourseEnroll(soup):
-	""" Extract course enroll count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[9].text.strip()
+def getClassEnroll(soup):
+	""" Extract class enroll count from response """
+	return soup.findAll('td')[9].text.strip()
 
-def getCourseWaitlist(soup):
-	""" Extract course waitlist count from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[10].text.strip()
+def getClassWaitlist(soup):
+	""" Extract class waitlist count from response """
+	return soup.findAll('td')[10].text.strip()
 
-def getCourseStatus(soup):
-	""" Extract course status from response """
-	return soup.find('tr', {'bgcolor' : '#FFFFCC'}).findAll('td')[16].text.strip()
+def getClassStatus(soup):
+	""" Extract class status from response """
+	return soup.findAll('td')[16].text.strip()
