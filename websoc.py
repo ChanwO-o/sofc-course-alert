@@ -45,16 +45,17 @@ def processResponse(response, codes):
 		cnameshort = getCourseNameShort(soup)
 		cnamelong = getCourseNameLong(soup)
 		
-		classtrblocks = splitHtmlByClass(soup) # now split html by individual class
-		print('Number of classes found:', str(len(classtrblocks)))
+		classtrblocks = splitHtmlByClass(soup) # now split html by individual class (may contain multiple classes)
+		print('Number of classes found for course:', str(len(classtrblocks)))
 		for trblock in classtrblocks:
-			ctype = getClassType(trblock) # can be multiple classes requested from here
-			cmax = getClassMax(trblock)
-			cenroll = getClassEnroll(trblock)
-			cwaitlist = getClassWaitlist(trblock)
-			cstatus = getClassStatus(trblock)
-			classtuple = (cnameshort, cnamelong, ctype, cmax, cenroll, cwaitlist, cstatus)
-			# print(classtuple)
+			classinfolist = trblock.findAll('td')
+			ccode = getClassCode(classinfolist)
+			ctype = getClassType(classinfolist)
+			cmax = getClassMax(classinfolist)
+			cenroll = getClassEnroll(classinfolist)
+			cwaitlist = getClassWaitlist(classinfolist)
+			cstatus = getClassStatus(classinfolist)
+			classtuple = (cnameshort, cnamelong, ccode, ctype, cmax, cenroll, cwaitlist, cstatus)
 			resultclasses.append(classtuple)
 
 	return resultclasses
@@ -83,22 +84,26 @@ def getCourseNameLong(soup):
 	""" Extract course long name from response (e.g. DATA STRC IMPL&ANLS) """
 	return soup.find('b').text.strip() # tr tag with bgcolor -> get bold tag -> text
 	
-def getClassType(soup):
+def getClassCode(classinfolist):
+	""" Extract class code from response """
+	return classinfolist[0].text.strip() # first td tag
+	
+def getClassType(classinfolist):
 	""" Extract class type from response (lec, dis, lab, etc) """
-	return soup.findAll('td')[1].text.strip() # second td tag
+	return classinfolist[1].text.strip() # second td tag
 
-def getClassMax(soup):
+def getClassMax(classinfolist):
 	""" Extract class max count from response """
-	return soup.findAll('td')[8].text.strip() # ninth td tag
+	return classinfolist[8].text.strip() # ninth td tag
 
-def getClassEnroll(soup):
+def getClassEnroll(classinfolist):
 	""" Extract class enroll count from response """
-	return soup.findAll('td')[9].text.strip()
+	return classinfolist[9].text.strip()
 
-def getClassWaitlist(soup):
+def getClassWaitlist(classinfolist):
 	""" Extract class waitlist count from response """
-	return soup.findAll('td')[10].text.strip()
+	return classinfolist[10].text.strip()
 
-def getClassStatus(soup):
+def getClassStatus(classinfolist):
 	""" Extract class status from response """
-	return soup.findAll('td')[16].text.strip()
+	return classinfolist[16].text.strip()
