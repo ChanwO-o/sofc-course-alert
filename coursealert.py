@@ -6,7 +6,8 @@ import time
 app = Flask(__name__)
 
 TIME_BETWEEN_REQUESTS = 300 #3600 # 1 hr
-COURSECODES = [34040, 34090, 34150, 34165, 34166, 34167]#[383, 34090]#
+COURSECODES = [36452,34160,36451,36452,36453,36454,36455,36456] # 34165, 34166, 34167, 34168, 34169, 34170, 34171, 34172] #34150, 36451, 36452, 36453, 36454, 36455, 36456] #[34040, 34090, 34150, 34165, 34166, 34167]#[383, 34090]#
+#36452 34160 36451 36452 36453 36454 36455 36456
 
 @app.route("/")
 def index():
@@ -19,7 +20,7 @@ def index():
 def startWatchingCourse():
 	while True:
 		coursesdatalist = websoc.requestCourses(COURSECODES)
-		# print(coursesdataToString(coursesdatalist))
+		print(coursesdataToString(coursesdatalist))
 		# compare contents of coursesdatalist with database to see changes
 		# if status change, send sms
 		send_sms.sendMessage(coursesdatalist, verbose=False)

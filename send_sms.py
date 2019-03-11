@@ -20,14 +20,16 @@ def sendMessage(coursesdatalist, verbose=True):
 	)
 	
 def constructBody(coursesdatalist):
+	""" Construct simple sms body """
 	result = ''
 	for classtuple in coursesdatalist:
 		classinfo = \
-		classtuple[0] + " " + str(classtuple[2]) + classtuple[7] + "\n."
+		classtuple[0] + " " + str(classtuple[2]) + ' ' + classtuple[7] + "\n."
 		result += classinfo
 	return result
 
 def constructVerboseBody(coursesdatalist):
+	""" Construct verbose sms body """
 	result = ''
 	for classtuple in coursesdatalist:
 		classinfo = \

@@ -21,10 +21,10 @@ def constructCourseCodeString(codes : [int]):
 def requestCourses(codes):
 	""" Make request for information on course by provided course codes """
 	response = requests.post(url = URL, data = constructRequestString(codes))
-	coursesdatalist = processResponse(response, codes)
+	coursesdatalist = processResponse(response)
 	return coursesdatalist
 
-def processResponse(response, codes):
+def processResponse(response):
 	""" Return a list of tuples with information on courses. In the form of (name, code, type, max, enroll, waitlist, status)  """
 	rtext = response.text
 	soup = BeautifulSoup(rtext, 'html.parser')
@@ -43,7 +43,7 @@ def processResponse(response, codes):
 		cnamelong = getCourseNameLong(soup)
 		
 		classtrblocks = splitHtmlByClass(soup) # now split html by individual class (may contain multiple classes)
-		# print('Number of classes found for course:', str(len(classtrblocks)))
+		print('Number of classes found for course:', str(len(classtrblocks)))
 		for trblock in classtrblocks:
 			classinfolist = trblock.findAll('td')
 			ccode = getClassCode(classinfolist)
@@ -70,7 +70,7 @@ def splitHtmlByClass(soup):
 	Some classes return more <tr> blocks with the same bgcolor, but the distinct leading <tr> block also has the valign="top" attribute attached as well.
 	"""
 	firstcolor = soup.findAll('tr', {'bgcolor' : '#FFFFCC', 'valign' : 'top'})
-	secondcolor = soup.findAll('tr', {'bgcolor' : '#DDEEFF', 'valign' : 'top'})
+	secondcolor = soup.findAll('tr', {'bgcolor' : False, 'valign' : 'top'})
 	return firstcolor + secondcolor # return extended list
 	
 def getCourseNameShort(soup):
