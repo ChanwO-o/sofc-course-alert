@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 
-TIME_BETWEEN_REQUESTS = 3600 # 1 hr
+TIME_BETWEEN_REQUESTS = 300 #3600 # 1 hr
 COURSECODES = [34040, 34090, 34150, 34165, 34166, 34167]#[383, 34090]#
 
 @app.route("/")
@@ -22,8 +22,7 @@ def startWatchingCourse():
 		# print(coursesdataToString(coursesdatalist))
 		# compare contents of coursesdatalist with database to see changes
 		# if status change, send sms
-		send_sms.sendMessage(coursesdatalist)
-		break
+		send_sms.sendMessage(coursesdatalist, verbose=False)
 		time.sleep(TIME_BETWEEN_REQUESTS) # perform total check every 1 hr
 	
 def coursesdataToString(coursesdatalist):
