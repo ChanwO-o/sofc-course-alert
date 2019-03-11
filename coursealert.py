@@ -21,10 +21,19 @@ def startWatchingCourse():
 	while True:
 		coursesdatalist = websoc.requestCourses(COURSECODES)
 		print(coursesdataToString(coursesdatalist))
-		# compare contents of coursesdatalist with database to see changes
+		# ULTIMATE GOAL: compare contents of coursesdatalist with database to see changes
 		# if status change, send sms
-		send_sms.sendMessage(coursesdatalist, verbose=False)
-		time.sleep(TIME_BETWEEN_REQUESTS) # perform total check every 1 hr
+		
+		# for now, just text OPEN classes only
+		openclasses = []
+		for classtuple in coursesdatalist:
+			if classtuple[-1] == 'OPEN':
+				openclasses.append(classtuple)
+
+		send_sms.sendMessage(coursesdatalist, verbose=False) # text entire class list
+		send_sms.sendMessage(openclasses, verbose=False) # text open classes only
+		
+		time.sleep(TIME_BETWEEN_REQUESTS) # perform total check every 5 minutes
 	
 def coursesdataToString(coursesdatalist):
 	result = ''
