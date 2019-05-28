@@ -2,10 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 
 URL = 'https://www.reg.uci.edu/perl/WebSoc'
+TERM = '2019-92' # school term (quarter) to register
 
 def constructRequestString(codes : [int]):
 	""" Construct the string to pass to websoc request """
-	return'Submit=Display+Web+Results&YearTerm=2019-14&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=' + constructCourseCodeString(codes) + '&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
+	return 'Submit=Display+Web+Results&YearTerm=' + TERM + '&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=+ALL&CourseNum=&Division=ANY&CourseCodes=' + constructCourseCodeString(codes) + '&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room='
 	
 def constructCourseCodeString(codes : [int]):
 	""" Construct course code portion of request string in the form of 34040+34090+34150 """
@@ -46,6 +47,7 @@ def processResponse(response):
 		print('Number of classes found for course:', str(len(classtrblocks)))
 		for trblock in classtrblocks:
 			classinfolist = trblock.findAll('td')
+			# print(classinfolist)
 			ccode = getClassCode(classinfolist)
 			ctype = getClassType(classinfolist)
 			cmax = getClassMax(classinfolist)
@@ -103,4 +105,4 @@ def getClassWaitlist(classinfolist):
 
 def getClassStatus(classinfolist):
 	""" Extract class status from response """
-	return classinfolist[16].text.strip()
+	return classinfolist[15].text.strip()

@@ -5,10 +5,11 @@ import time
 
 app = Flask(__name__)
 
-TIME_BETWEEN_REQUESTS = 300 #3600 # 1 hr
-COURSECODES = [36451,36452,36453,36454,36455,36456,34160,34166,34167,34168,34169,34170,34171,34172,34130]
-#[36451,36452,36453,36454,36455,36456,34160,34166,34167,34168,34169,34170,34171,34172,34130]
-#36452 34160 36451 36452 36453 36454 36455 36456
+TIME_BETWEEN_REQUESTS = 6
+COURSECODES = [34170, 34113, 34114, 34190]
+# 34170: 147 iot
+# 34113, 34114: 134 better discussion
+# 34190: 161 lec
 
 @app.route("/")
 def index():
@@ -27,7 +28,7 @@ def startWatchingCourse():
 		# for now, just text all OPEN classes
 		openclasses = []
 		for classtuple in coursesdatalist:
-			if classtuple[-1] == 'OPEN':
+			if classtuple[-1] != 'FULL':
 				openclasses.append(classtuple)
 
 		# send_sms.sendMessage(coursesdatalist, verbose=False) # option 1: text entire class list
