@@ -1,8 +1,8 @@
 import os
 from twilio.rest import Client
 
-account_sid = "AC9d3524428dee9fc80c4088b312020b1e"
-auth_token = "ca52852b96d616c75e529ed4ea06045c"
+account_sid = "AC4021eef031bb9390bfe0bb690aa3418a"
+auth_token = "2a9b697ca047a001b2a3e3a079837223"
 
 client = Client(account_sid, auth_token)
 
@@ -15,7 +15,7 @@ def sendMessage(coursesdatalist, verbose=True):
 		smsbody = "SofC\n" + constructBody(coursesdatalist)
 	client.messages.create(
 		to = "+13106668374",
-		from_= "+12132796150",
+		from_= "+17865653761",
 		body = smsbody
 	)
 	
